@@ -358,7 +358,7 @@ wheels = [
 ]
 
 [[package]]
-name = "county-study"
+name = "stadium-bonds"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
