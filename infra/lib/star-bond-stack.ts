@@ -34,7 +34,7 @@ export class StarBondStack extends cdk.Stack {
     // S3 Bucket for Frontend Assets
     // ========================================
     const websiteBucket = new s3.Bucket(this, 'WebsiteBucket', {
-      bucketName: domainName ? `${domainName.replace(/\./g, '-')}-website` : undefined,
+      // Let CloudFormation generate unique bucket names to avoid conflicts
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
@@ -43,7 +43,7 @@ export class StarBondStack extends cdk.Stack {
 
     // S3 Bucket for Data Files (PDFs, Excel files)
     const dataBucket = new s3.Bucket(this, 'DataBucket', {
-      bucketName: domainName ? `${domainName.replace(/\./g, '-')}-data` : undefined,
+      // Let CloudFormation generate unique bucket names to avoid conflicts
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: cdk.RemovalPolicy.RETAIN,
       encryption: s3.BucketEncryption.S3_MANAGED,
@@ -123,10 +123,10 @@ export class StarBondStack extends cdk.Stack {
       },
       additionalBehaviors: {
         // API requests go to API Gateway
+        // CloudFront strips /api prefix and routes to API Gateway stage /api
         '/api/*': {
           origin: new origins.HttpOrigin(
-            `${api.restApiId}.execute-api.${this.region}.amazonaws.com`,
-            { originPath: '/api' }
+            `${api.restApiId}.execute-api.${this.region}.amazonaws.com`
           ),
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,

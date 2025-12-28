@@ -23,10 +23,10 @@ export async function buildServer(): Promise<FastifyInstance> {
     origin: process.env['CORS_ORIGIN'] ?? '*',
   });
 
-  // Serve static data files
+  // Serve static data files (prefix without /api since API Gateway stage handles that)
   await server.register(fastifyStatic, {
     root: path.join(__dirname, '../../data'),
-    prefix: '/api/data/',
+    prefix: '/data/',
     decorateReply: false,
   });
 
