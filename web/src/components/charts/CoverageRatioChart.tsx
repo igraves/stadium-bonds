@@ -11,7 +11,7 @@ import {
   Cell,
 } from 'recharts';
 import type { AmortizationRow } from '../../types';
-import { PERIOD_COLORS, getPeriodColor } from '../../utils/colors';
+import { getPeriodColor } from '../../utils/colors';
 import { formatRatio } from '../../utils/formatters';
 
 interface CoverageRatioChartProps {
@@ -47,8 +47,8 @@ export function CoverageRatioChart({ schedule, requiredRatio }: CoverageRatioCha
             tickFormatter={(value) => `${value.toFixed(1)}x`}
           />
           <Tooltip
-            formatter={(value: number, name: string, props: { payload: { actualCoverage: number } }) => {
-              const actual = props.payload.actualCoverage;
+            formatter={(_value, _name, props) => {
+              const actual = (props.payload as { actualCoverage: number }).actualCoverage;
               return [formatRatio(actual), 'Coverage Ratio'];
             }}
             labelFormatter={(label) => `Year ${label}`}
@@ -60,11 +60,6 @@ export function CoverageRatioChart({ schedule, requiredRatio }: CoverageRatioCha
             }}
           />
           <Legend
-            payload={[
-              { value: 'Cap Period', type: 'square', color: PERIOD_COLORS.cap },
-              { value: 'Amortization', type: 'square', color: PERIOD_COLORS.amort },
-              { value: 'Paid Off', type: 'square', color: PERIOD_COLORS.paid },
-            ]}
             wrapperStyle={{ fontSize: '11px' }}
           />
 

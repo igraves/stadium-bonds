@@ -1,5 +1,5 @@
 import type { AmortizationRow, SimulationSummary } from '../types';
-import type { BondParams, RevenueStream, LocalAddInsConfig, StreamOverrides } from '../types';
+import type { BondParams, LocalAddInsConfig, StreamOverrides } from '../types';
 import { RAW_TAX_BASES, DEFAULT_GROCERY_EXEMPTIONS, RevenueStreamType } from '../types';
 
 interface ExportParams {

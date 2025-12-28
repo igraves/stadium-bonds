@@ -17,15 +17,17 @@ export interface RevenueStream {
 /**
  * Predefined revenue stream types
  */
-export enum RevenueStreamType {
-  STATE_SALES_TAX = 'state_sales_tax',
-  USE_TAX = 'use_tax',
-  LET = 'let',
-  LIQUOR_EXCISE = 'liquor_excise',
-  APSK = 'apsk',
-  OLATHE_LOCAL = 'olathe_local',
-  WYANDOTTE_UG_LOCAL = 'wyandotte_ug_local',
-}
+export const RevenueStreamType = {
+  STATE_SALES_TAX: 'state_sales_tax',
+  USE_TAX: 'use_tax',
+  LET: 'let',
+  LIQUOR_EXCISE: 'liquor_excise',
+  APSK: 'apsk',
+  OLATHE_LOCAL: 'olathe_local',
+  WYANDOTTE_UG_LOCAL: 'wyandotte_ug_local',
+} as const;
+
+export type RevenueStreamType = typeof RevenueStreamType[keyof typeof RevenueStreamType];
 
 /**
  * Default raw base values BEFORE grocery exemption adjustment

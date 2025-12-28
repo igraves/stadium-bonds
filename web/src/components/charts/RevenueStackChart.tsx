@@ -45,9 +45,9 @@ export function RevenueStackChart({ schedule }: RevenueStackChartProps) {
             tickFormatter={(value) => `$${(value / 1e6).toFixed(0)}M`}
           />
           <Tooltip
-            formatter={(value: number, name: string) => [
-              formatCurrency(value),
-              getStreamDisplayName(name),
+            formatter={(value, name) => [
+              formatCurrency(value as number),
+              getStreamDisplayName(name as string),
             ]}
             labelFormatter={(label) => `Year ${label}`}
             contentStyle={{
