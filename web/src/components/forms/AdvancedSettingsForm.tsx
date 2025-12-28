@@ -13,6 +13,8 @@ import { formatCurrency } from '../../utils/formatters';
 interface AdvancedSettingsFormProps {
   streamOverrides: StreamOverrides;
   onChange: (overrides: StreamOverrides) => void;
+  privateInvestment: number;
+  onPrivateInvestmentChange: (value: number) => void;
 }
 
 // Tax streams with grocery exemption controls
@@ -56,7 +58,12 @@ const getDefaultGroceryExemption = (streamType: RevenueStreamType): number => {
   return 0;
 };
 
-export function AdvancedSettingsForm({ streamOverrides, onChange }: AdvancedSettingsFormProps) {
+export function AdvancedSettingsForm({
+  streamOverrides,
+  onChange,
+  privateInvestment,
+  onPrivateInvestmentChange
+}: AdvancedSettingsFormProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const handleBaseChange = (streamType: RevenueStreamType, value: string) => {
@@ -285,6 +292,38 @@ export function AdvancedSettingsForm({ streamOverrides, onChange }: AdvancedSett
 
       {isExpanded && (
         <div className="space-y-4 pt-2">
+          {/* Private Investment */}
+          <div className="space-y-3 pb-3 border-b border-gray-100">
+            <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Private Investment
+            </h4>
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500 w-16">Amount:</span>
+                <div className="flex-1 relative">
+                  <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">$</span>
+                  <input
+                    type="number"
+                    value={(privateInvestment / 1_000_000_000).toFixed(2)}
+                    onChange={(e) => {
+                      const val = parseFloat(e.target.value);
+                      if (!isNaN(val)) {
+                        onPrivateInvestmentChange(val * 1_000_000_000);
+                      }
+                    }}
+                    className="w-full pl-5 pr-8 py-1 text-xs border border-gray-200 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    step="0.1"
+                    min="0"
+                  />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">B</span>
+                </div>
+              </div>
+              <div className="text-xs text-gray-400">
+                Default: $1.6B (team/private contribution to stadium)
+              </div>
+            </div>
+          </div>
+
           {/* Tax Streams with Grocery Exemption */}
           <div className="space-y-3">
             <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wider">

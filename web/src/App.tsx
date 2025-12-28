@@ -4,6 +4,7 @@ import { Header } from './components/layout/Header';
 import { ParameterPanel } from './components/ParameterPanel';
 import { MetricsSummary } from './components/MetricsSummary';
 import { RevenueStackChart } from './components/charts/RevenueStackChart';
+import { FundingPieChart } from './components/charts/FundingPieChart';
 import { RevenueVsDebtChart } from './components/charts/RevenueVsDebtChart';
 import { PrincipalBalanceChart } from './components/charts/PrincipalBalanceChart';
 import { CoverageRatioChart } from './components/charts/CoverageRatioChart';
@@ -40,6 +41,7 @@ function Dashboard() {
   const [localAddIns, setLocalAddIns] = useState<LocalAddInsConfig>(initialUrlParams.localAddIns);
   const [paydownPct, setPaydownPct] = useState(initialUrlParams.paydownPct);
   const [streamOverrides, setStreamOverrides] = useState<StreamOverrides>(initialUrlParams.streamOverrides);
+  const [privateInvestment, setPrivateInvestment] = useState(1_600_000_000); // $1.6B default
 
   // URL parameter synchronization
   const shareableParams = useMemo(() => ({
@@ -94,10 +96,12 @@ function Dashboard() {
           localAddIns={localAddIns}
           paydownPct={paydownPct}
           streamOverrides={streamOverrides}
+          privateInvestment={privateInvestment}
           onBondParamsChange={setBondParams}
           onLocalAddInsChange={setLocalAddIns}
           onPaydownPctChange={setPaydownPct}
           onStreamOverridesChange={setStreamOverrides}
+          onPrivateInvestmentChange={setPrivateInvestment}
           onReset={handleReset}
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
@@ -165,6 +169,14 @@ function Dashboard() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                     <Card title="Revenue by Source">
                       <RevenueStackChart schedule={result.schedule} />
+                    </Card>
+
+                    <Card title="Public vs Private Investment">
+                      <FundingPieChart
+                        publicPrincipal={result.summary.initialPrincipal}
+                        publicInterest={result.summary.totalInterest}
+                        privateInvestment={privateInvestment}
+                      />
                     </Card>
 
                     <Card title="Revenue vs Debt Service">

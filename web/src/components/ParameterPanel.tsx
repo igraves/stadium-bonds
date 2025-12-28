@@ -10,10 +10,12 @@ interface ParameterPanelProps {
   localAddIns: LocalAddInsConfig;
   paydownPct: number;
   streamOverrides: StreamOverrides;
+  privateInvestment: number;
   onBondParamsChange: (params: BondParams) => void;
   onLocalAddInsChange: (config: LocalAddInsConfig) => void;
   onPaydownPctChange: (pct: number) => void;
   onStreamOverridesChange: (overrides: StreamOverrides) => void;
+  onPrivateInvestmentChange: (value: number) => void;
   onReset: () => void;
   isOpen: boolean;
   onClose: () => void;
@@ -24,10 +26,12 @@ export function ParameterPanel({
   localAddIns,
   paydownPct,
   streamOverrides,
+  privateInvestment,
   onBondParamsChange,
   onLocalAddInsChange,
   onPaydownPctChange,
   onStreamOverridesChange,
+  onPrivateInvestmentChange,
   onReset,
   isOpen,
   onClose,
@@ -87,6 +91,8 @@ export function ParameterPanel({
             <AdvancedSettingsForm
               streamOverrides={streamOverrides}
               onChange={onStreamOverridesChange}
+              privateInvestment={privateInvestment}
+              onPrivateInvestmentChange={onPrivateInvestmentChange}
             />
           </div>
 
