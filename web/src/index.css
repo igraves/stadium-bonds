@@ -1,0 +1,51 @@
+@import "tailwindcss";
+
+@source "../index.html";
+@source "./**/*.{js,ts,jsx,tsx}";
+
+@theme {
+  /* Revenue stream colors matching Python notebooks */
+  --color-stream-sales-use: #2ecc71;
+  --color-stream-let: #9b59b6;
+  --color-stream-liquor-excise: #e74c3c;
+  --color-stream-apsk: #3498db;
+  --color-stream-olathe: #f39c12;
+  --color-stream-wyandotte: #1abc9c;
+
+  /* Period status colors */
+  --color-period-cap: #95a5a6;
+  --color-period-amort: #27ae60;
+  --color-period-paid: #3498db;
+}
+
+:root {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #f8fafc;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
