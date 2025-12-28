@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "LOCAL_DEV=true tsx watch src/index.ts",
     "build": "tsc",
     "build:lambda": "npm run build && node scripts/bundle-lambda.js",
     "start": "node dist/index.js",

@@ -19,6 +19,7 @@ infra/cdk.out/
 # Environment
 .env
 .env.local
+.DS_Store
 
 # CDK
 *.d.ts
