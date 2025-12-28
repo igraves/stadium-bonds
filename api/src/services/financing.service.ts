@@ -94,12 +94,20 @@ export class FinancingService {
 
   /**
    * Build bond parameters with defaults
+   * Automatically adjusts maxCapYears if it would exceed termYears
    */
   private buildBondParams(partial?: Partial<BondParams>): BondParams {
-    return {
+    const merged = {
       ...DEFAULT_BOND_PARAMS,
       ...partial,
     };
+
+    // Ensure maxCapYears is less than termYears
+    if (merged.maxCapYears >= merged.termYears) {
+      merged.maxCapYears = Math.max(1, merged.termYears - 1);
+    }
+
+    return merged;
   }
 
   /**
