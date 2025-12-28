@@ -3,6 +3,8 @@
  */
 export const STREAM_COLORS: Record<string, string> = {
   sales_use_increment: '#2ecc71',
+  state_sales_tax: '#2ecc71',    // Green - primary state tax
+  use_tax: '#00bcd4',            // Cyan/teal - distinct from sales tax
   let: '#9b59b6',
   liquor_excise: '#e74c3c',
   apsk: '#3498db',
@@ -42,6 +44,8 @@ export function getPeriodColor(inCapPeriod: boolean, bondsRetired: boolean): str
 export function getStreamDisplayName(streamKey: string): string {
   const displayNames: Record<string, string> = {
     sales_use_increment: 'Sales + Use Tax',
+    state_sales_tax: 'State Sales Tax',
+    use_tax: 'Use Tax',
     let: 'Liquor Enforcement Tax',
     liquor_excise: 'Liquor Excise',
     apsk: 'Sports Wagering (APSK)',
