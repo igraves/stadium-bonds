@@ -8,3 +8,12 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Node.js
+node_modules/
+api/dist/
+api/node_modules/
+
+# Environment
+.env
+.env.local

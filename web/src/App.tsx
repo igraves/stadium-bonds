@@ -1,0 +1,218 @@
+import { useState, useMemo } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Header } from './components/layout/Header';
+import { ParameterPanel } from './components/ParameterPanel';
+import { MetricsSummary } from './components/MetricsSummary';
+import { RevenueStackChart } from './components/charts/RevenueStackChart';
+import { RevenueVsDebtChart } from './components/charts/RevenueVsDebtChart';
+import { PrincipalBalanceChart } from './components/charts/PrincipalBalanceChart';
+import { CoverageRatioChart } from './components/charts/CoverageRatioChart';
+import { AmortizationTable } from './components/AmortizationTable';
+import { SensitivityView } from './components/SensitivityView';
+import { InfoModal } from './components/InfoModal';
+import { Card } from './components/ui/Card';
+import { CardSkeleton, MetricsSkeleton, TableSkeleton } from './components/ui/Skeleton';
+import { useSimulation, useDefaults } from './hooks/useSimulation';
+import { useDebounce } from './hooks/useDebounce';
+import type { BondParams, LocalAddInsConfig, SimulateRequest, StreamOverrides } from './types';
+import { DEFAULT_BOND_PARAMS, DEFAULT_LOCAL_ADD_INS, DEFAULT_REVENUE_STREAMS } from './types';
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
+type ViewTab = 'dashboard' | 'sensitivity';
+
+function Dashboard() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [infoOpen, setInfoOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<ViewTab>('dashboard');
+  const [bondParams, setBondParams] = useState<BondParams>(DEFAULT_BOND_PARAMS);
+  const [localAddIns, setLocalAddIns] = useState<LocalAddInsConfig>(DEFAULT_LOCAL_ADD_INS);
+  const [paydownPct, setPaydownPct] = useState(0);
+  const [streamOverrides, setStreamOverrides] = useState<StreamOverrides>({});
+
+  // Reset all parameters to defaults
+  const handleReset = () => {
+    setBondParams(DEFAULT_BOND_PARAMS);
+    setLocalAddIns(DEFAULT_LOCAL_ADD_INS);
+    setPaydownPct(0);
+    setStreamOverrides({});
+  };
+
+  // Load defaults from API
+  useDefaults();
+
+  // Build request object
+  const request: SimulateRequest = useMemo(
+    () => ({
+      bond: bondParams,
+      localAddIns,
+      excessPaydownPct: paydownPct,
+      streamOverrides,
+    }),
+    [bondParams, localAddIns, paydownPct, streamOverrides]
+  );
+
+  // Debounce the request to avoid excessive API calls
+  const debouncedRequest = useDebounce(request, 300);
+
+  // Fetch simulation results
+  const { data: response, isLoading, error } = useSimulation(debouncedRequest, true);
+
+  const result = response?.data;
+
+  return (
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <Header onMenuClick={() => setSidebarOpen(true)} onInfoClick={() => setInfoOpen(true)} />
+
+      {/* Info Modal */}
+      <InfoModal isOpen={infoOpen} onClose={() => setInfoOpen(false)} />
+
+      <div className="flex flex-1 overflow-hidden">
+        <ParameterPanel
+          bondParams={bondParams}
+          localAddIns={localAddIns}
+          paydownPct={paydownPct}
+          streamOverrides={streamOverrides}
+          onBondParamsChange={setBondParams}
+          onLocalAddInsChange={setLocalAddIns}
+          onPaydownPctChange={setPaydownPct}
+          onStreamOverridesChange={setStreamOverrides}
+          onReset={handleReset}
+          isOpen={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+        />
+
+        <main className="flex-1 overflow-y-auto p-4 lg:p-6">
+          {/* Tab Navigation */}
+          <div className="mb-6 border-b border-gray-200">
+            <nav className="-mb-px flex gap-6">
+              <button
+                onClick={() => setActiveTab('dashboard')}
+                className={`
+                  pb-3 text-sm font-medium border-b-2 transition-colors
+                  ${activeTab === 'dashboard'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }
+                `}
+              >
+                Dashboard
+              </button>
+              <button
+                onClick={() => setActiveTab('sensitivity')}
+                className={`
+                  pb-3 text-sm font-medium border-b-2 transition-colors
+                  ${activeTab === 'sensitivity'
+                    ? 'border-blue-600 text-blue-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }
+                `}
+              >
+                Sensitivity Analysis
+              </button>
+            </nav>
+          </div>
+
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+              Error loading simulation: {error.message}
+            </div>
+          )}
+
+          {/* Dashboard Tab */}
+          {activeTab === 'dashboard' && (
+            <>
+              {isLoading && !result && (
+                <div className="space-y-6">
+                  <MetricsSkeleton />
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <CardSkeleton />
+                    <CardSkeleton />
+                    <CardSkeleton />
+                    <CardSkeleton />
+                  </div>
+                  <TableSkeleton />
+                </div>
+              )}
+
+              {result && (
+                <div className="space-y-6">
+                  {/* Metrics Summary */}
+                  <MetricsSummary summary={result.summary} />
+
+                  {/* Charts Grid */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                    <Card title="Revenue by Source">
+                      <RevenueStackChart schedule={result.schedule} />
+                    </Card>
+
+                    <Card title="Revenue vs Debt Service">
+                      <RevenueVsDebtChart
+                        schedule={result.schedule}
+                        annualDebtService={result.summary.annualDebtService}
+                        coverageRatio={result.summary.coverageRatio}
+                        capYears={result.summary.capitalizationYears}
+                        payoffYear={result.summary.payoffYear}
+                      />
+                    </Card>
+
+                    <Card title="Principal Balance">
+                      <PrincipalBalanceChart
+                        schedule={result.schedule}
+                        initialPrincipal={result.summary.initialPrincipal}
+                        payoffYear={result.summary.payoffYear}
+                      />
+                    </Card>
+
+                    <Card title="Coverage Ratio">
+                      <CoverageRatioChart
+                        schedule={result.schedule}
+                        requiredRatio={result.summary.coverageRatio}
+                      />
+                    </Card>
+                  </div>
+
+                  {/* Amortization Table */}
+                  <Card title="Amortization Schedule">
+                    <AmortizationTable
+                      schedule={result.schedule}
+                      payoffYear={result.summary.payoffYear}
+                      summary={result.summary}
+                      bondParams={bondParams}
+                      localAddIns={localAddIns}
+                      streamOverrides={streamOverrides}
+                      paydownPct={paydownPct}
+                    />
+                  </Card>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* Sensitivity Tab */}
+          {activeTab === 'sensitivity' && (
+            <SensitivityView
+              bondParams={bondParams}
+              localAddIns={localAddIns}
+            />
+          )}
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Dashboard />
+    </QueryClientProvider>
+  );
+}
