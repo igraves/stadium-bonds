@@ -1,7 +1,6 @@
 import {
   ComposedChart,
   Area,
-  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -68,13 +67,13 @@ export function RevenueVsDebtChart({
             tickFormatter={(value) => `$${(value / 1e6).toFixed(0)}M`}
           />
           <Tooltip
-            formatter={(value: number, name: string) => {
+            formatter={(value, name) => {
               const labels: Record<string, string> = {
                 available: 'Available Revenue',
                 debtService: 'Debt Service',
                 extraPrincipal: 'Extra Principal',
               };
-              return [formatCurrency(value), labels[name] ?? name];
+              return [formatCurrency(value as number), labels[name as string] ?? name];
             }}
             labelFormatter={(label) => `Year ${label}`}
             contentStyle={{

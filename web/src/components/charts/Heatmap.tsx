@@ -147,8 +147,8 @@ export function Heatmap<T extends Record<string, unknown>>({
  * Generate a color scale for heatmaps
  */
 export function createColorScale(
-  minValue: number,
-  maxValue: number,
+  _minValue: number,
+  _maxValue: number,
   colorStops: { value: number; color: string }[]
 ): (value: number | null, viable: boolean) => string {
   return (value: number | null, viable: boolean): string => {

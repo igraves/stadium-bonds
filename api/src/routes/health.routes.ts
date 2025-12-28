@@ -8,7 +8,7 @@ export async function healthRoutes(server: FastifyInstance): Promise<void> {
    * Health check endpoint
    */
   server.get<{ Reply: HealthResponse }>(
-    '/api/health',
+    '/health',
     async (): Promise<HealthResponse> => {
       return {
         status: 'ok',

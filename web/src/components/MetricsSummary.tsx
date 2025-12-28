@@ -1,6 +1,6 @@
 import { CheckCircle, XCircle, TrendingDown, Calendar, DollarSign, Percent } from 'lucide-react';
 import type { SimulationSummary } from '../types';
-import { formatCurrency, formatPercent, formatPayoffYear } from '../utils/formatters';
+import { formatCurrency, formatPayoffYear } from '../utils/formatters';
 import { Card } from './ui/Card';
 
 interface MetricsSummaryProps {
