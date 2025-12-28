@@ -14,8 +14,12 @@ import { Card } from './components/ui/Card';
 import { CardSkeleton, MetricsSkeleton, TableSkeleton } from './components/ui/Skeleton';
 import { useSimulation, useDefaults } from './hooks/useSimulation';
 import { useDebounce } from './hooks/useDebounce';
+import { parseUrlParamsOnMount, useUrlParams } from './hooks/useUrlParams';
 import type { BondParams, LocalAddInsConfig, SimulateRequest, StreamOverrides } from './types';
 import { DEFAULT_BOND_PARAMS, DEFAULT_LOCAL_ADD_INS } from './types';
+
+// Parse URL params once at module load to get initial state
+const initialUrlParams = parseUrlParamsOnMount();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -32,10 +36,20 @@ function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<ViewTab>('dashboard');
-  const [bondParams, setBondParams] = useState<BondParams>(DEFAULT_BOND_PARAMS);
-  const [localAddIns, setLocalAddIns] = useState<LocalAddInsConfig>(DEFAULT_LOCAL_ADD_INS);
-  const [paydownPct, setPaydownPct] = useState(0);
-  const [streamOverrides, setStreamOverrides] = useState<StreamOverrides>({});
+  const [bondParams, setBondParams] = useState<BondParams>(initialUrlParams.bondParams);
+  const [localAddIns, setLocalAddIns] = useState<LocalAddInsConfig>(initialUrlParams.localAddIns);
+  const [paydownPct, setPaydownPct] = useState(initialUrlParams.paydownPct);
+  const [streamOverrides, setStreamOverrides] = useState<StreamOverrides>(initialUrlParams.streamOverrides);
+
+  // URL parameter synchronization
+  const shareableParams = useMemo(() => ({
+    bondParams,
+    localAddIns,
+    paydownPct,
+    streamOverrides,
+  }), [bondParams, localAddIns, paydownPct, streamOverrides]);
+
+  const { copyShareUrl } = useUrlParams(shareableParams);
 
   // Reset all parameters to defaults
   const handleReset = () => {
@@ -69,7 +83,7 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header onMenuClick={() => setSidebarOpen(true)} onInfoClick={() => setInfoOpen(true)} />
+      <Header onMenuClick={() => setSidebarOpen(true)} onInfoClick={() => setInfoOpen(true)} onShareClick={copyShareUrl} />
 
       {/* Info Modal */}
       <InfoModal isOpen={infoOpen} onClose={() => setInfoOpen(false)} />

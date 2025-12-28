@@ -1,11 +1,24 @@
-import { Menu, Info } from 'lucide-react';
+import { useState } from 'react';
+import { Menu, Info, Share2, Check } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick: () => void;
   onInfoClick: () => void;
+  onShareClick?: () => Promise<boolean>;
 }
 
-export function Header({ onMenuClick, onInfoClick }: HeaderProps) {
+export function Header({ onMenuClick, onInfoClick, onShareClick }: HeaderProps) {
+  const [copySuccess, setCopySuccess] = useState(false);
+
+  const handleShare = async () => {
+    if (!onShareClick) return;
+    const success = await onShareClick();
+    if (success) {
+      setCopySuccess(true);
+      setTimeout(() => setCopySuccess(false), 2000);
+    }
+  };
+
   return (
     <header className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -31,6 +44,32 @@ export function Header({ onMenuClick, onInfoClick }: HeaderProps) {
           </button>
         </div>
       </div>
+      {onShareClick && (
+        <button
+          onClick={handleShare}
+          className={`
+            flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+            ${copySuccess
+              ? 'bg-green-100 text-green-700'
+              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+            }
+          `}
+          aria-label="Share simulation settings"
+          title="Copy shareable link to clipboard"
+        >
+          {copySuccess ? (
+            <>
+              <Check className="w-4 h-4" />
+              <span>Copied!</span>
+            </>
+          ) : (
+            <>
+              <Share2 className="w-4 h-4" />
+              <span className="hidden sm:inline">Share</span>
+            </>
+          )}
+        </button>
+      )}
     </header>
   );
 }
