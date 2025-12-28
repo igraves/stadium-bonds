@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "api",
-    "web"
+    "web",
+    "infra"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev -w api\" \"npm run dev -w web\"",
@@ -12,7 +13,14 @@
     "dev:web": "npm run dev -w web",
     "build": "npm run build -w api && npm run build -w web",
     "build:api": "npm run build -w api",
-    "build:web": "npm run build -w web"
+    "build:web": "npm run build -w web",
+    "build:lambda": "npm run build:lambda -w api",
+    "build:infra": "npm run build -w infra",
+    "build:deploy": "npm run build:web && npm run build:lambda && npm run build:infra",
+    "cdk:synth": "npm run synth -w infra",
+    "cdk:deploy": "npm run build:deploy && npm run deploy -w infra",
+    "cdk:destroy": "npm run destroy -w infra",
+    "cdk:diff": "npm run diff -w infra"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
