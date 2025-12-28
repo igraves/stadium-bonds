@@ -12,8 +12,15 @@ wheels/
 # Node.js
 node_modules/
 api/dist/
-api/node_modules/
+web/dist/
+infra/dist/
+infra/cdk.out/
 
 # Environment
 .env
 .env.local
+
+# CDK
+*.d.ts
+!infra/lib/*.d.ts
+cdk.context.json
