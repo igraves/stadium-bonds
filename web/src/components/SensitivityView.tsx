@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import {
   BarChart,
   Bar,
@@ -10,9 +10,18 @@ import {
   Cell,
 } from 'recharts';
 import { Card } from './ui/Card';
-import { usePaydownComparison } from '../hooks/useSimulation';
-import type { BondParams, LocalAddInsConfig } from '../types';
+import { Heatmap, createColorScale } from './charts/Heatmap';
+import { usePaydownComparison, useSensitivity } from '../hooks/useSimulation';
+import type { BondParams, LocalAddInsConfig, SensitivityCell } from '../types';
 import { formatCurrency } from '../utils/formatters';
+
+type MetricKey = 'capYears' | 'totalInterestB' | 'payoffYear';
+
+const METRIC_OPTIONS: { key: MetricKey; label: string; description: string }[] = [
+  { key: 'capYears', label: 'Capitalization Years', description: 'Years of interest-only payments' },
+  { key: 'totalInterestB', label: 'Total Interest ($B)', description: 'Total interest paid over bond life' },
+  { key: 'payoffYear', label: 'Payoff Year', description: 'Year when bonds are fully paid' },
+];
 
 interface SensitivityViewProps {
   bondParams: BondParams;
@@ -20,6 +29,14 @@ interface SensitivityViewProps {
 }
 
 export function SensitivityView({ bondParams, localAddIns }: SensitivityViewProps) {
+  const [selectedMetric, setSelectedMetric] = useState<MetricKey>('payoffYear');
+
+  // Fetch sensitivity analysis
+  const { data: sensitivityData, isLoading: sensitivityLoading } = useSensitivity({
+    bond: bondParams,
+    localAddIns,
+  });
+
   // Fetch paydown comparison
   const { data: paydownData, isLoading: paydownLoading } = usePaydownComparison({
     bond: bondParams,
@@ -37,7 +54,51 @@ export function SensitivityView({ bondParams, localAddIns }: SensitivityViewProp
     }));
   }, [paydownData]);
 
-  if (paydownLoading) {
+  // Create color scale based on selected metric
+  const colorScale = useMemo(() => {
+    const grid = sensitivityData?.data?.grid || [];
+    const values = grid
+      .filter((c) => c.viable && c[selectedMetric] !== null)
+      .map((c) => c[selectedMetric] as number);
+
+    if (values.length === 0) {
+      return createColorScale(0, 100, [
+        { value: 0, color: '#dcfce7' },
+        { value: 100, color: '#166534' },
+      ]);
+    }
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    // Different color schemes for different metrics
+    if (selectedMetric === 'totalInterestB') {
+      // Lower is better for total interest - green to red
+      return createColorScale(min, max, [
+        { value: min, color: '#dcfce7' }, // green-100
+        { value: (min + max) / 2, color: '#fef9c3' }, // yellow-100
+        { value: max, color: '#fecaca' }, // red-200
+      ]);
+    } else {
+      // Lower is better for capYears and payoffYear - green to red
+      return createColorScale(min, max, [
+        { value: min, color: '#dcfce7' }, // green-100
+        { value: (min + max) / 2, color: '#fef9c3' }, // yellow-100
+        { value: max, color: '#fecaca' }, // red-200
+      ]);
+    }
+  }, [sensitivityData, selectedMetric]);
+
+  // Format value based on metric
+  const formatValue = (value: number | null): string => {
+    if (value === null) return '—';
+    if (selectedMetric === 'totalInterestB') {
+      return `$${value.toFixed(1)}B`;
+    }
+    return value.toString();
+  };
+
+  if (sensitivityLoading && paydownLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -47,6 +108,79 @@ export function SensitivityView({ bondParams, localAddIns }: SensitivityViewProp
 
   return (
     <div className="space-y-6">
+      {/* Sensitivity Matrix Section */}
+      <Card title="Interest Rate vs Growth Rate Sensitivity">
+        <div className="space-y-4">
+          {/* Metric Selector */}
+          <div className="flex flex-wrap gap-2">
+            {METRIC_OPTIONS.map((option) => (
+              <button
+                key={option.key}
+                onClick={() => setSelectedMetric(option.key)}
+                className={`
+                  px-3 py-1.5 text-sm font-medium rounded-lg transition-colors
+                  ${selectedMetric === option.key
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }
+                `}
+                title={option.description}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Heatmap */}
+          {sensitivityLoading ? (
+            <div className="flex items-center justify-center h-64">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : sensitivityData?.data?.grid ? (
+            <div className="overflow-x-auto py-4">
+              <Heatmap<SensitivityCell>
+                data={sensitivityData.data.grid}
+                xKey="interestRate"
+                yKey="growthRate"
+                valueKey={selectedMetric}
+                xLabels={sensitivityData.data.interestRates}
+                yLabels={sensitivityData.data.growthRates}
+                formatValue={formatValue}
+                formatXLabel={(v) => `${(v * 100).toFixed(1)}%`}
+                formatYLabel={(v) => `${(v * 100).toFixed(1)}%`}
+                colorScale={colorScale}
+                xAxisLabel="Interest Rate"
+                yAxisLabel="Growth Rate"
+                viableKey="viable"
+              />
+            </div>
+          ) : (
+            <div className="text-center text-gray-500 py-8">
+              No sensitivity data available
+            </div>
+          )}
+
+          {/* Legend */}
+          <div className="flex items-center gap-4 text-xs text-gray-600">
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 rounded bg-green-100 border border-green-200" />
+              <span>Better</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 rounded bg-yellow-100 border border-yellow-200" />
+              <span>Moderate</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 rounded bg-red-100 border border-red-200" />
+              <span>Worse</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <div className="w-4 h-4 rounded bg-red-50 border border-red-200" />
+              <span>Not Viable</span>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {/* Paydown Comparison Section */}
       <Card title="Paydown Comparison">

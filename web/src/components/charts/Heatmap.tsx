@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-interface HeatmapProps<T> {
+interface HeatmapProps<T extends object> {
   data: T[];
   xKey: keyof T;
   yKey: keyof T;
@@ -18,7 +18,7 @@ interface HeatmapProps<T> {
   viableKey?: keyof T;
 }
 
-export function Heatmap<T extends Record<string, unknown>>({
+export function Heatmap<T extends object>({
   data,
   xKey,
   yKey,

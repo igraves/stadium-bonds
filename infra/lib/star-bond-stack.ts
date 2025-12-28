@@ -19,6 +19,8 @@ export interface StarBondStackProps extends cdk.StackProps {
   hostedZoneId?: string;
   /** ACM certificate ARN (must be in us-east-1 for CloudFront) */
   certificateArn?: string;
+  /** Email address for feedback form submissions */
+  feedbackEmail?: string;
 }
 
 export class StarBondStack extends cdk.Stack {
@@ -28,7 +30,7 @@ export class StarBondStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: StarBondStackProps = {}) {
     super(scope, id, props);
 
-    const { domainName, hostedZoneId, certificateArn } = props;
+    const { domainName, hostedZoneId, certificateArn, feedbackEmail } = props;
 
     // ========================================
     // S3 Bucket for Frontend Assets
@@ -61,12 +63,21 @@ export class StarBondStack extends cdk.Stack {
       environment: {
         NODE_ENV: 'production',
         DATA_BUCKET: dataBucket.bucketName,
+        FEEDBACK_EMAIL: feedbackEmail || '',
       },
       description: 'STAR Bond Financing API - Fastify on Lambda',
     });
 
     // Grant Lambda read access to data bucket
     dataBucket.grantRead(apiFunction);
+
+    // Grant Lambda permission to send emails via SES
+    if (feedbackEmail) {
+      apiFunction.addToRolePolicy(new iam.PolicyStatement({
+        actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+        resources: ['*'],
+      }));
+    }
 
     // ========================================
     // API Gateway

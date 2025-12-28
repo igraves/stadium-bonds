@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Menu, Info, Share2, Check } from 'lucide-react';
+import { Menu, Info, Share2, Check, MessageSquare } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick: () => void;
   onInfoClick: () => void;
+  onFeedbackClick: () => void;
   onShareClick?: () => Promise<boolean>;
 }
 
-export function Header({ onMenuClick, onInfoClick, onShareClick }: HeaderProps) {
+export function Header({ onMenuClick, onInfoClick, onFeedbackClick, onShareClick }: HeaderProps) {
   const [copySuccess, setCopySuccess] = useState(false);
 
   const handleShare = async () => {
@@ -44,32 +45,43 @@ export function Header({ onMenuClick, onInfoClick, onShareClick }: HeaderProps) 
           </button>
         </div>
       </div>
-      {onShareClick && (
+      <div className="flex items-center gap-2">
         <button
-          onClick={handleShare}
-          className={`
-            flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
-            ${copySuccess
-              ? 'bg-green-100 text-green-700'
-              : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
-            }
-          `}
-          aria-label="Share simulation settings"
-          title="Copy shareable link to clipboard"
+          onClick={onFeedbackClick}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700"
+          aria-label="Send feedback"
+          title="Send feedback"
         >
-          {copySuccess ? (
-            <>
-              <Check className="w-4 h-4" />
-              <span>Copied!</span>
-            </>
-          ) : (
-            <>
-              <Share2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Share</span>
-            </>
-          )}
+          <MessageSquare className="w-4 h-4" />
+          <span className="hidden sm:inline">Feedback</span>
         </button>
-      )}
+        {onShareClick && (
+          <button
+            onClick={handleShare}
+            className={`
+              flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors
+              ${copySuccess
+                ? 'bg-green-100 text-green-700'
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+              }
+            `}
+            aria-label="Share simulation settings"
+            title="Copy shareable link to clipboard"
+          >
+            {copySuccess ? (
+              <>
+                <Check className="w-4 h-4" />
+                <span>Copied!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4" />
+                <span className="hidden sm:inline">Share</span>
+              </>
+            )}
+          </button>
+        )}
+      </div>
     </header>
   );
 }

@@ -23,6 +23,7 @@
     "cdk:diff": "npm run diff -w infra"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "puppeteer": "^24.34.0"
   }
 }

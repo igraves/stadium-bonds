@@ -1,6 +1,7 @@
 import type { FastifyInstance } from 'fastify';
 import { healthRoutes } from './health.routes.js';
 import { simulateRoutes } from './simulate.routes.js';
+import { feedbackRoutes } from './feedback.routes.js';
 
 /**
  * Register all routes
@@ -12,4 +13,5 @@ export async function registerRoutes(server: FastifyInstance): Promise<void> {
   // In production (Lambda), API Gateway handles the /api prefix
   const apiPrefix = process.env['LOCAL_DEV'] === 'true' ? '/api' : '';
   await server.register(simulateRoutes, { prefix: apiPrefix });
+  await server.register(feedbackRoutes, { prefix: apiPrefix });
 }

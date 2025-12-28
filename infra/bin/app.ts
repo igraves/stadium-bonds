@@ -9,6 +9,7 @@ const app = new cdk.App();
 const domainName = app.node.tryGetContext('domainName') || process.env.DOMAIN_NAME;
 const hostedZoneId = app.node.tryGetContext('hostedZoneId') || process.env.HOSTED_ZONE_ID;
 const certificateArn = app.node.tryGetContext('certificateArn') || process.env.CERTIFICATE_ARN;
+const feedbackEmail = app.node.tryGetContext('feedbackEmail') || process.env.FEEDBACK_EMAIL;
 
 new StarBondStack(app, 'StarBondStack', {
   env: {
@@ -18,6 +19,7 @@ new StarBondStack(app, 'StarBondStack', {
   domainName,
   hostedZoneId,
   certificateArn,
+  feedbackEmail,
   description: 'STAR Bond Financing Dashboard - CloudFront + S3 + Lambda + API Gateway',
 });
 

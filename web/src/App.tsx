@@ -10,7 +10,10 @@ import { PrincipalBalanceChart } from './components/charts/PrincipalBalanceChart
 import { CoverageRatioChart } from './components/charts/CoverageRatioChart';
 import { AmortizationTable } from './components/AmortizationTable';
 import { SensitivityView } from './components/SensitivityView';
+import { InsightsCard } from './components/InsightsCard';
 import { InfoModal } from './components/InfoModal';
+import { WelcomeModal } from './components/WelcomeModal';
+import { FeedbackModal } from './components/FeedbackModal';
 import { Card } from './components/ui/Card';
 import { CardSkeleton, MetricsSkeleton, TableSkeleton } from './components/ui/Skeleton';
 import { useSimulation, useDefaults } from './hooks/useSimulation';
@@ -36,6 +39,11 @@ type ViewTab = 'dashboard' | 'sensitivity';
 function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(() => {
+    // Show welcome modal if user hasn't seen it before
+    return !localStorage.getItem('welcomeDismissed');
+  });
   const [activeTab, setActiveTab] = useState<ViewTab>('dashboard');
   const [bondParams, setBondParams] = useState<BondParams>(initialUrlParams.bondParams);
   const [localAddIns, setLocalAddIns] = useState<LocalAddInsConfig>(initialUrlParams.localAddIns);
@@ -59,6 +67,12 @@ function Dashboard() {
     setLocalAddIns(DEFAULT_LOCAL_ADD_INS);
     setPaydownPct(0);
     setStreamOverrides({});
+  };
+
+  // Dismiss welcome modal and remember preference
+  const handleWelcomeClose = () => {
+    setWelcomeOpen(false);
+    localStorage.setItem('welcomeDismissed', 'true');
   };
 
   // Load defaults from API
@@ -85,10 +99,16 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header onMenuClick={() => setSidebarOpen(true)} onInfoClick={() => setInfoOpen(true)} onShareClick={copyShareUrl} />
+      <Header onMenuClick={() => setSidebarOpen(true)} onInfoClick={() => setInfoOpen(true)} onFeedbackClick={() => setFeedbackOpen(true)} onShareClick={copyShareUrl} />
+
+      {/* Welcome Modal */}
+      <WelcomeModal isOpen={welcomeOpen} onClose={handleWelcomeClose} />
 
       {/* Info Modal */}
       <InfoModal isOpen={infoOpen} onClose={() => setInfoOpen(false)} />
+
+      {/* Feedback Modal */}
+      <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
 
       <div className="flex flex-1 overflow-hidden">
         <ParameterPanel
@@ -164,6 +184,9 @@ function Dashboard() {
                 <div className="space-y-6">
                   {/* Metrics Summary */}
                   <MetricsSummary summary={result.summary} />
+
+                  {/* Analysis Insights - Full Width */}
+                  <InsightsCard onFeedbackClick={() => setFeedbackOpen(true)} />
 
                   {/* Charts Grid */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
