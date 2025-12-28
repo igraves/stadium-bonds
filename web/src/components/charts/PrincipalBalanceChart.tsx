@@ -57,13 +57,13 @@ export function PrincipalBalanceChart({
             tickFormatter={(value) => `$${(value / 1e6).toFixed(0)}M`}
           />
           <Tooltip
-            formatter={(value: number, name: string) => {
+            formatter={(value, name) => {
               const labels: Record<string, string> = {
                 principal: 'Principal Balance',
                 extraPrincipal: 'Extra Principal Paid',
               };
-              const scale = name === 'principal' ? 'B' : 'M';
-              return [formatCurrency(value, { scale }), labels[name] ?? name];
+              const scale = (name as string) === 'principal' ? 'B' : 'M';
+              return [formatCurrency(value as number, { scale }), labels[name as string] ?? name];
             }}
             labelFormatter={(label) => `Year ${label}`}
             contentStyle={{

@@ -15,7 +15,7 @@ import { CardSkeleton, MetricsSkeleton, TableSkeleton } from './components/ui/Sk
 import { useSimulation, useDefaults } from './hooks/useSimulation';
 import { useDebounce } from './hooks/useDebounce';
 import type { BondParams, LocalAddInsConfig, SimulateRequest, StreamOverrides } from './types';
-import { DEFAULT_BOND_PARAMS, DEFAULT_LOCAL_ADD_INS, DEFAULT_REVENUE_STREAMS } from './types';
+import { DEFAULT_BOND_PARAMS, DEFAULT_LOCAL_ADD_INS } from './types';
 
 const queryClient = new QueryClient({
   defaultOptions: {
