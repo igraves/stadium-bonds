@@ -13,7 +13,7 @@ const certificateArn = app.node.tryGetContext('certificateArn') || process.env.C
 new StarBondStack(app, 'StarBondStack', {
   env: {
     account: process.env.CDK_DEFAULT_ACCOUNT,
-    region: process.env.CDK_DEFAULT_REGION || 'us-east-1',
+    region: process.env.CDK_DEFAULT_REGION || 'us-east-2',
   },
   domainName,
   hostedZoneId,
