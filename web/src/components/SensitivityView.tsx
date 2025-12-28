@@ -90,7 +90,7 @@ export function SensitivityView({ bondParams, localAddIns }: SensitivityViewProp
     if (!paydownData?.data?.comparison) return [];
     return paydownData.data.comparison.map((row) => ({
       ...row,
-      label: `${row.paydownPct}%`,
+      label: `${row.paydownPct * 100}%`,
       totalInterest: row.totalInterestB * 1e9,
       savings: row.interestSavingsM * 1e6,
     }));
@@ -254,7 +254,7 @@ export function SensitivityView({ bondParams, localAddIns }: SensitivityViewProp
             <tbody className="bg-white divide-y divide-gray-200">
               {paydownData?.data?.comparison.map((row) => (
                 <tr key={row.paydownPct} className={!row.viable ? 'bg-red-50' : ''}>
-                  <td className="px-4 py-2 font-medium">{row.paydownPct}%</td>
+                  <td className="px-4 py-2 font-medium">{row.paydownPct * 100}%</td>
                   <td className="px-4 py-2">${row.totalInterestB.toFixed(2)}B</td>
                   <td className="px-4 py-2">Year {row.payoffYear}</td>
                   <td className="px-4 py-2 text-green-600">
