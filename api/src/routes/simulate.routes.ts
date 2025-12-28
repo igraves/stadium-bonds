@@ -16,7 +16,7 @@ export async function simulateRoutes(server: FastifyInstance): Promise<void> {
    * Get default parameter values
    */
   server.get<{ Reply: DefaultsResponse }>(
-    '/api/defaults',
+    '/defaults',
     async (): Promise<DefaultsResponse> => {
       return financingService.getDefaults();
     }
@@ -27,7 +27,7 @@ export async function simulateRoutes(server: FastifyInstance): Promise<void> {
    * Run a single financing simulation
    */
   server.post<{ Body: SimulateRequest; Reply: SimulateResponse }>(
-    '/api/simulate',
+    '/simulate',
     {
       schema: {
         body: {
@@ -75,7 +75,7 @@ export async function simulateRoutes(server: FastifyInstance): Promise<void> {
    * Run sensitivity analysis grid
    */
   server.post<{ Body: SensitivityRequest; Reply: SensitivityResponse }>(
-    '/api/simulate/sensitivity',
+    '/simulate/sensitivity',
     {
       schema: {
         body: {
@@ -109,7 +109,7 @@ export async function simulateRoutes(server: FastifyInstance): Promise<void> {
    * Compare different paydown percentages
    */
   server.post<{ Body: PaydownComparisonRequest; Reply: PaydownComparisonResponse }>(
-    '/api/simulate/compare-paydown',
+    '/simulate/compare-paydown',
     {
       schema: {
         body: {
