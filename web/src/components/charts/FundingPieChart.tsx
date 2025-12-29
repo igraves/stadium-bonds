@@ -27,37 +27,39 @@ export function FundingPieChart({ publicPrincipal, publicInterest, privateInvest
   const privatePct = ((privateInvestment / total) * 100).toFixed(1);
 
   return (
-    <div className="h-72">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            innerRadius={60}
-            outerRadius={90}
-            paddingAngle={2}
-            dataKey="value"
-            label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`}
-            labelLine={false}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip
-            formatter={(value: unknown) => formatCurrency(value as number)}
-          />
-          <Legend
-            verticalAlign="bottom"
-            height={36}
-            formatter={(value) => <span className="text-xs text-gray-600">{value}</span>}
-          />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="flex flex-col">
+      <div className="h-56">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={50}
+              outerRadius={75}
+              paddingAngle={2}
+              dataKey="value"
+              label={({ percent }) => `${((percent ?? 0) * 100).toFixed(0)}%`}
+              labelLine={false}
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip
+              formatter={(value: unknown) => formatCurrency(value as number)}
+            />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              formatter={(value) => <span className="text-xs text-gray-600">{value}</span>}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
 
       {/* Summary below chart */}
-      <div className="mt-2 grid grid-cols-2 gap-4 text-center text-sm">
+      <div className="grid grid-cols-2 gap-4 text-center text-sm pt-2">
         <div>
           <div className="text-gray-500">Public Spend</div>
           <div className="font-semibold text-blue-600">

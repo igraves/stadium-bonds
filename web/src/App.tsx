@@ -11,6 +11,7 @@ import { CoverageRatioChart } from './components/charts/CoverageRatioChart';
 import { AmortizationTable } from './components/AmortizationTable';
 import { SensitivityView } from './components/SensitivityView';
 import { InsightsCard } from './components/InsightsCard';
+import { TaxpayerImpactCard } from './components/TaxpayerImpactCard';
 import { InfoModal } from './components/InfoModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import { FeedbackModal } from './components/FeedbackModal';
@@ -190,9 +191,12 @@ function Dashboard() {
 
                   {/* Charts Grid */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                    <Card title="Revenue by Source">
-                      <RevenueStackChart schedule={result.schedule} />
-                    </Card>
+                    <TaxpayerImpactCard
+                      principal={result.summary.initialPrincipal}
+                      totalInterest={result.summary.totalInterest}
+                      payoffYear={result.summary.payoffYear}
+                      termYears={result.summary.termYears}
+                    />
 
                     <Card title="Public vs Private Investment">
                       <FundingPieChart
@@ -200,6 +204,10 @@ function Dashboard() {
                         publicInterest={result.summary.totalInterest}
                         privateInvestment={privateInvestment}
                       />
+                    </Card>
+
+                    <Card title="Revenue by Source">
+                      <RevenueStackChart schedule={result.schedule} />
                     </Card>
 
                     <Card title="Revenue vs Debt Service">
