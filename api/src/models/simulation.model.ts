@@ -136,12 +136,10 @@ export function simulateStarFinancing(
       principal += interestCap;
       capitalizedInterest += interestCap;
 
-      // Apply excess revenue to principal paydown during cap period
+      // Apply ALL excess revenue to principal during cap period (100%, ignoring paydown setting)
+      // This accelerates getting out of capitalization before normal amortization begins
       const excessDuringCap = Math.max(0, avail - interestDue);
-      let extraPrincipalCap = Math.min(
-        excessDuringCap * excessPaydownPct,
-        principal
-      );
+      let extraPrincipalCap = Math.min(excessDuringCap, principal);
       extraPrincipalCap = Math.max(0, extraPrincipalCap);
       principal -= extraPrincipalCap;
       totalExtraPrincipal += extraPrincipalCap;
