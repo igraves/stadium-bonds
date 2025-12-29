@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Menu, Info, Share2, Check, MessageSquare } from 'lucide-react';
+import { Settings, Info, Share2, Check, MessageSquare } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -26,9 +26,10 @@ export function Header({ onMenuClick, onInfoClick, onFeedbackClick, onShareClick
         <button
           onClick={onMenuClick}
           className="lg:hidden p-2 rounded-md hover:bg-gray-100"
-          aria-label="Toggle menu"
+          aria-label="Open settings"
+          title="Settings"
         >
-          <Menu className="w-5 h-5 text-gray-600" />
+          <Settings className="w-5 h-5 text-gray-600" />
         </button>
         <div className="flex items-center gap-2">
           <div>

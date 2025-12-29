@@ -15,12 +15,11 @@ import { usePaydownComparison, useSensitivity } from '../hooks/useSimulation';
 import type { BondParams, LocalAddInsConfig, SensitivityCell } from '../types';
 import { formatCurrency } from '../utils/formatters';
 
-type MetricKey = 'capYears' | 'totalInterestB' | 'payoffYear';
+type MetricKey = 'capYears' | 'totalInterestB';
 
 const METRIC_OPTIONS: { key: MetricKey; label: string; description: string }[] = [
   { key: 'capYears', label: 'Capitalization Years', description: 'Years of interest-only payments' },
   { key: 'totalInterestB', label: 'Total Interest ($B)', description: 'Total interest paid over bond life' },
-  { key: 'payoffYear', label: 'Payoff Year', description: 'Year when bonds are fully paid' },
 ];
 
 interface SensitivityViewProps {
@@ -29,7 +28,7 @@ interface SensitivityViewProps {
 }
 
 export function SensitivityView({ bondParams, localAddIns }: SensitivityViewProps) {
-  const [selectedMetric, setSelectedMetric] = useState<MetricKey>('payoffYear');
+  const [selectedMetric, setSelectedMetric] = useState<MetricKey>('totalInterestB');
 
   // Fetch sensitivity analysis
   const { data: sensitivityData, isLoading: sensitivityLoading } = useSensitivity({
