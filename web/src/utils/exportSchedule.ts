@@ -179,7 +179,7 @@ function generateScheduleSection(schedule: AmortizationRow[]): string[][] {
       formatCsvCurrency(row.extraPrincipal),
       formatCsvCurrency(row.debtService),
       formatCsvCurrency(row.endingPrincipal),
-      row.coverageRatio.toFixed(4),
+      row.coverageRatio !== null ? row.coverageRatio.toFixed(4) : 'N/A',
       formatCsvCurrency(row.excessRevenue),
       row.inCapPeriod ? 'Yes' : 'No',
       row.bondsRetired ? 'Yes' : 'No',

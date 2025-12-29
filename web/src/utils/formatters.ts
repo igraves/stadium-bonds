@@ -29,7 +29,8 @@ export function formatPercent(value: number, decimals: number = 1): string {
 /**
  * Format a coverage ratio
  */
-export function formatRatio(value: number, decimals: number = 2): string {
+export function formatRatio(value: number | null | undefined, decimals: number = 2): string {
+  if (value === null || value === undefined) return '—';
   if (!isFinite(value)) return '∞';
   return `${value.toFixed(decimals)}x`;
 }

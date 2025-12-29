@@ -22,7 +22,7 @@ interface CoverageRatioChartProps {
 export function CoverageRatioChart({ schedule, requiredRatio }: CoverageRatioChartProps) {
   const data = schedule.map((row) => ({
     year: row.year,
-    coverage: Math.min(row.coverageRatio, 5), // Cap at 5x for display
+    coverage: row.coverageRatio !== null ? Math.min(row.coverageRatio, 5) : 5, // Cap at 5x for display, use max for null (Infinity)
     actualCoverage: row.coverageRatio,
     inCapPeriod: row.inCapPeriod,
     bondsRetired: row.bondsRetired,

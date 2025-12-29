@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -127,7 +127,7 @@ export function AmortizationTable({
         cell: (info) => {
           const val = info.getValue();
           const row = info.row.original;
-          if (row.inCapPeriod) {
+          if (row.inCapPeriod || val === null || val === undefined) {
             return <span className="text-gray-400">—</span>;
           }
           const color = val >= 1.3 ? 'text-green-600' : val >= 1.0 ? 'text-yellow-600' : 'text-red-600';
@@ -162,12 +162,19 @@ export function AmortizationTable({
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
+    autoResetPageIndex: true, // Reset to page 1 when data changes
     initialState: {
       pagination: {
         pageSize: 15,
       },
     },
   });
+
+  // Explicitly reset to first page when data changes
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    table.setPageIndex(0);
+  }, [schedule]);
 
   return (
     <div className="space-y-4">

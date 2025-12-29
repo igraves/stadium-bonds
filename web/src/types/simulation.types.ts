@@ -14,7 +14,8 @@ export interface AmortizationRow {
   extraPrincipal: number;
   debtService: number;
   endingPrincipal: number;
-  coverageRatio: number;
+  /** Coverage ratio - null when Infinity (serialized from JSON) */
+  coverageRatio: number | null;
   inCapPeriod: boolean;
   excessRevenue: number;
   bondsRetired: boolean;

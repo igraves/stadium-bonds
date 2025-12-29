@@ -64,9 +64,9 @@ export function simulateStarFinancing(
     for (let year = 0; year < bond.termYears; year++) {
       const interestDue = principal * bond.interestRate;
       const avail = available[year] ?? 0;
-      const required = debtService * bond.coverageRatio;
 
-      if (year < bond.maxCapYears && avail < required) {
+      // Cap period ends when revenue can cover debt service (not coverage ratio)
+      if (year < bond.maxCapYears && avail < debtService) {
         // Capitalize shortfall
         const paid = Math.min(avail, interestDue);
         const shortfall = interestDue - paid;
@@ -136,6 +136,16 @@ export function simulateStarFinancing(
       principal += interestCap;
       capitalizedInterest += interestCap;
 
+      // Apply excess revenue to principal paydown during cap period
+      const excessDuringCap = Math.max(0, avail - interestDue);
+      let extraPrincipalCap = Math.min(
+        excessDuringCap * excessPaydownPct,
+        principal
+      );
+      extraPrincipalCap = Math.max(0, extraPrincipalCap);
+      principal -= extraPrincipalCap;
+      totalExtraPrincipal += extraPrincipalCap;
+
       results.push({
         year: year + 1,
         availableRevenue: avail,
@@ -143,12 +153,12 @@ export function simulateStarFinancing(
         interestPaid,
         interestCapitalized: interestCap,
         principalPaid: 0,
-        extraPrincipal: 0,
+        extraPrincipal: extraPrincipalCap,
         debtService: interestPaid,
         endingPrincipal: Math.max(0, principal),
         coverageRatio: debtService > 0 ? avail / debtService : Infinity,
         inCapPeriod: true,
-        excessRevenue: 0,
+        excessRevenue: excessDuringCap - extraPrincipalCap,
         bondsRetired: false,
         revenueByStream,
       });
