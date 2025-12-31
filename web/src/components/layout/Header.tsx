@@ -1,14 +1,15 @@
 import { useState } from 'react';
-import { Settings, Info, Share2, Check, MessageSquare } from 'lucide-react';
+import { Settings, Info, Share2, Check, MessageSquare, BookOpen } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick: () => void;
   onInfoClick: () => void;
   onFeedbackClick: () => void;
+  onGlossaryClick: () => void;
   onShareClick?: () => Promise<boolean>;
 }
 
-export function Header({ onMenuClick, onInfoClick, onFeedbackClick, onShareClick }: HeaderProps) {
+export function Header({ onMenuClick, onInfoClick, onFeedbackClick, onGlossaryClick, onShareClick }: HeaderProps) {
   const [copySuccess, setCopySuccess] = useState(false);
 
   const handleShare = async () => {
@@ -38,15 +39,25 @@ export function Header({ onMenuClick, onInfoClick, onFeedbackClick, onShareClick
           </div>
           <button
             onClick={onInfoClick}
-            className="p-1.5 rounded-full hover:bg-blue-50 text-blue-600 transition-colors"
+            className="flex items-center gap-1 px-2 py-1 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-700 transition-colors border border-blue-200"
             aria-label="View model assumptions and data sources"
             title="Model Assumptions & Data Sources"
           >
-            <Info className="w-5 h-5" />
+            <Info className="w-4 h-4" />
+            <span className="text-xs font-medium hidden sm:inline">Assumptions</span>
           </button>
         </div>
       </div>
       <div className="flex items-center gap-2">
+        <button
+          onClick={onGlossaryClick}
+          className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200"
+          aria-label="View glossary of terms"
+          title="Glossary of Terms"
+        >
+          <BookOpen className="w-4 h-4" />
+          <span className="hidden sm:inline">Glossary</span>
+        </button>
         <button
           onClick={onFeedbackClick}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors bg-gray-100 hover:bg-gray-200 text-gray-700"

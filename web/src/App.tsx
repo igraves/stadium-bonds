@@ -15,6 +15,7 @@ import { TaxpayerImpactCard } from './components/TaxpayerImpactCard';
 import { InfoModal } from './components/InfoModal';
 import { WelcomeModal } from './components/WelcomeModal';
 import { FeedbackModal } from './components/FeedbackModal';
+import { GlossaryModal } from './components/GlossaryModal';
 import { Card } from './components/ui/Card';
 import { CardSkeleton, MetricsSkeleton, TableSkeleton } from './components/ui/Skeleton';
 import { useSimulation, useDefaults } from './hooks/useSimulation';
@@ -41,6 +42,7 @@ function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(() => {
     // Show welcome modal if user hasn't seen it before
     return !localStorage.getItem('welcomeDismissed');
@@ -100,7 +102,13 @@ function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Header onMenuClick={() => setSidebarOpen(true)} onInfoClick={() => setInfoOpen(true)} onFeedbackClick={() => setFeedbackOpen(true)} onShareClick={copyShareUrl} />
+      <Header
+        onMenuClick={() => setSidebarOpen(true)}
+        onInfoClick={() => setInfoOpen(true)}
+        onFeedbackClick={() => setFeedbackOpen(true)}
+        onGlossaryClick={() => setGlossaryOpen(true)}
+        onShareClick={copyShareUrl}
+      />
 
       {/* Welcome Modal */}
       <WelcomeModal isOpen={welcomeOpen} onClose={handleWelcomeClose} />
@@ -110,6 +118,9 @@ function Dashboard() {
 
       {/* Feedback Modal */}
       <FeedbackModal isOpen={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+
+      {/* Glossary Modal */}
+      <GlossaryModal isOpen={glossaryOpen} onClose={() => setGlossaryOpen(false)} />
 
       <div className="flex flex-1 overflow-hidden">
         <ParameterPanel
