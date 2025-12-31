@@ -17,14 +17,39 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('submitting');
     setErrorMessage('');
+
+    // Client-side validation with clear messages
+    if (!name.trim()) {
+      setStatus('error');
+      setErrorMessage('Please enter your name.');
+      return;
+    }
+    if (!email.trim()) {
+      setStatus('error');
+      setErrorMessage('Please enter your email address so we can respond to your feedback.');
+      return;
+    }
+    // Basic email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setStatus('error');
+      setErrorMessage('Please enter a valid email address.');
+      return;
+    }
+    if (message.trim().length < 10) {
+      setStatus('error');
+      setErrorMessage('Please enter a message (at least 10 characters).');
+      return;
+    }
+
+    setStatus('submitting');
 
     try {
       const response = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message }),
+        body: JSON.stringify({ name: name.trim(), email: email.trim(), message: message.trim() }),
       });
 
       const data = await response.json();
@@ -36,11 +61,16 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
         setMessage('');
       } else {
         setStatus('error');
-        setErrorMessage(data.error || 'Failed to send feedback');
+        // Provide user-friendly message for server configuration issues
+        if (data.error?.includes('not configured')) {
+          setErrorMessage('Unable to send feedback at this time. Please try again later or email directly.');
+        } else {
+          setErrorMessage(data.error || 'Failed to send feedback. Please try again.');
+        }
       }
     } catch {
       setStatus('error');
-      setErrorMessage('Network error. Please try again.');
+      setErrorMessage('Network error. Please check your connection and try again.');
     }
   };
 
