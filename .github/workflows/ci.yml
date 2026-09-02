@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  notebooks:
+    name: Execute financing notebooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Sync Python environment
+        run: uv sync --frozen
+
+      # Executes each notebook top to bottom and fails on the first cell that
+      # raises. Output goes to /dev/null: this is a smoke test that the model
+      # still runs, not a check that the numbers are unchanged.
+      - name: Run star_financing_model.ipynb
+        run: >
+          uv run --frozen jupyter nbconvert --to notebook --execute
+          --stdout star_financing_model.ipynb > /dev/null
+
+      - name: Run star_financing_accelerated.ipynb
+        run: >
+          uv run --frozen jupyter nbconvert --to notebook --execute
+          --stdout star_financing_accelerated.ipynb > /dev/null
+
+  app:
+    name: Build API and web app
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type-check and build both workspaces
+        run: npm run build
+
+      - name: Build the Lambda bundle
+        run: npm run build:lambda
+
+      - name: Check the API answers with the default scenario
+        run: |
+          LOCAL_DEV=true PORT=3000 node api/dist/index.js &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:3000/health > /dev/null && break
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:3000/health
+          curl -sf -X POST http://127.0.0.1:3000/api/simulate \
+            -H 'Content-Type: application/json' -d '{}' \
+            | node -e '
+              let raw = "";
+              process.stdin.on("data", (d) => (raw += d));
+              process.stdin.on("end", () => {
+                const { success, data } = JSON.parse(raw);
+                if (!success || data.schedule.length !== data.summary.termYears) {
+                  throw new Error("unexpected /api/simulate response");
+                }
+                console.log(
+                  `annual debt service $${Math.round(data.summary.annualDebtService / 1e6)}M ` +
+                  `after ${data.summary.capitalizationYears} capitalization years`
+                );
+              });
+            '
