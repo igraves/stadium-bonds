@@ -34,6 +34,11 @@ jobs:
           uv run --frozen jupyter nbconvert --to notebook --execute
           --stdout star_financing_accelerated.ipynb > /dev/null
 
+      - name: Run tax_bond_analysis.ipynb
+        run: >
+          uv run --frozen jupyter nbconvert --to notebook --execute
+          --stdout tax_bond_analysis.ipynb > /dev/null
+
   app:
     name: Build API and web app
     runs-on: ubuntu-latest
@@ -46,6 +51,9 @@ jobs:
           cache: npm
 
       - run: npm ci
+
+      - name: Lint the web app
+        run: npm run lint -w web
 
       - name: Type-check and build both workspaces
         run: npm run build
