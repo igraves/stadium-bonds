@@ -12,12 +12,16 @@ An open, auditable financial model of the Kansas STAR bond financing for the pro
 
 Under the executed STAR Bond Agreement (Project Monitor 2.0, December 22, 2025), the state finances $1.8B of a $3.0B stadium through 30-year STAR bonds repaid from *incremental* state sales, use, alcohol, and sports-wagering tax revenue inside the district — only growth above the base year is captured.
 
-At default assumptions (5.0% bond rate, 2.5% revenue growth, 4-year construction, 1.30x coverage):
+At default assumptions ($2.4B issued, 5.0% bond rate, 2.5% revenue growth, 1.30x coverage):
 
-- Gross bond proceeds of roughly **$2.43B** are needed to fund $1.8B of construction plus debt service during construction.
-- Annual debt service is about **$158M**, requiring ~**$206M/yr** of pledged revenue at 1.30x coverage.
-- Increment revenue does not reach that threshold until **Year 12**. Years 5–11 show a cumulative shortfall of roughly **$400–500M** that has to be covered by reserve funds, state appropriations, or other pledged streams.
-- Over 30 years, sales + use tax provides over 95% of the increment. Alcohol and sports wagering are marginal.
+- Pledged revenue cannot cover debt service in the early years, because STAR captures only *growth* above a frozen base and that growth starts near zero. The unpaid interest is **capitalized** — added to principal, where it earns interest itself.
+- Principal grows from $2.4B to about **$2.6B** before amortization begins. Annual debt service is then roughly **$187–197M**, requiring **$243–257M/yr** at 1.30x coverage.
+- Revenue does not reach that threshold until **Year 8–12**, depending on which of the two use tax estimates you use and which capitalization rule. Until then the debt compounds.
+- Total interest over 30 years is **$2.6–3.1B** — more than the amount borrowed. Under the reference model, $0.54B of principal is still outstanding at Year 30.
+- Sales + use tax supplies about **88%** of pledged revenue, and **96%** of the *growth* being diverted. Alcohol and sports wagering are marginal either way.
+
+The two ranges above are not uncertainty bands — they are two implementations
+that genuinely disagree. Both are documented rather than averaged.
 
 Every input above is adjustable in the live tool and the notebooks. Full derivations and sources:
 

@@ -170,10 +170,12 @@ export function AmortizationTable({
     },
   });
 
-  // Explicitly reset to first page when data changes
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Explicitly reset to first page when data changes. `table` is intentionally
+  // omitted: useReactTable returns a new instance each render, so including it
+  // would reset the page on every render instead of only when the data changes.
   useEffect(() => {
     table.setPageIndex(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [schedule]);
 
   return (

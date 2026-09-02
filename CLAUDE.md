@@ -80,7 +80,9 @@ Johnson County represents **24.7%** of statewide LET collections.
 | **APSK Fund (80% of state share)** | **$8.36 million** | **$9.0 million** |
 | Problem Gambling (3% of state share) | $336,000 | $360,000 |
 
-**APSK Allocation for STAR Bonds**: 65% of APSK Fund = **$5.4M - $5.9M/year**
+**APSK Allocation for STAR Bonds**: the statutory Sports Fund split sends 65% to
+STAR debt service. The *model* pledges **75%** of the APSK Fund
+(`APSK_PLEDGE_PCT = 0.75`) = **$6.5M/year**. See `ASSUMPTIONS.md`.
 
 **Context**: Kansas sports wagering began September 2022. Market stabilizing at ~$112-120M annual gross revenue. Four licensed operators (FanDuel, DraftKings, BetMGM, Caesars).
 
@@ -157,7 +159,7 @@ Including use tax adds **$2.0B - $3.3B** to 30-year projections.
 |--------|-------------|-------------------|
 | LET (district portion) | ~$17.4M/year | $200-330M |
 | Liquor Drink Tax (state) | ~$8.2M/year | $93-155M |
-| APSK (65% pledged) | ~$5.7M/year | $65-108M |
+| APSK (75% pledged in model) | ~$6.5M/year | $65-108M |
 
 Alcohol + gaming streams = **6-10%** of total STAR financing capacity.
 Sales + use tax increment = **90-94%** of financing capacity.
@@ -165,6 +167,12 @@ Sales + use tax increment = **90-94%** of financing capacity.
 ---
 
 ## Key Analytical Conclusions: Chiefs STAR Bond Financing
+
+> The figures in this section are earlier sales-only and sales+use scenario
+> ranges at 2% and 3% growth, kept as background on how the conclusions were
+> reached. They are **not** the model's current output. For results at current
+> defaults — including the two use tax bases and the two capitalization rules
+> that are live in the code — see `ASSUMPTIONS.md` and `BOND_ASSUMPTIONS.md`.
 
 ### Executive Summary
 
@@ -202,13 +210,16 @@ The Kansas Chiefs STAR Bond financing is **fundamentally a sales tax diversion m
 ### Sports Wagering / APSK Fund
 
 - State APSK intake: ~$8.7-9.0M/year
-- 65% pledged to STAR bonds: ~$5.5-6.0M/year
+- Model pledges 75%: ~$6.5M/year (statute's Sports Fund split is 65%; the
+  implementations use 75%)
 - 30-year incremental contribution: ~$65-108M
 
 ### Structural Mechanics
 
 The financing relies on:
-1. **Capitalized interest** during construction
+1. **Capitalized interest** — unpaid interest in the early years is added to
+   principal, where it compounds. This is the core mechanic; the model does not
+   assume debt service is deferred or funded from proceeds during construction.
 2. **Oversized STAR district footprint** capturing broad economic activity
 3. **Coverage ratio requirements** (1.3x-1.5x) that necessitate multiple revenue streams
 4. **30+ year pledge horizon** maximizing captured growth

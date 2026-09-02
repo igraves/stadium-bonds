@@ -85,3 +85,48 @@ export function getHeatmapColor(value: number, min: number, max: number, invert:
     return `rgb(${r}, ${g}, ${b})`;
   }
 }
+
+/**
+ * Generate a color scale for heatmaps
+ */
+export function createColorScale(
+  _minValue: number,
+  _maxValue: number,
+  colorStops: { value: number; color: string }[]
+): (value: number | null, viable: boolean) => string {
+  return (value: number | null, viable: boolean): string => {
+    if (value === null) return '#f3f4f6'; // gray-100
+    if (!viable) return '#fef2f2'; // red-50
+
+    // Find which color stops we're between
+    for (let i = 0; i < colorStops.length - 1; i++) {
+      const start = colorStops[i];
+      const end = colorStops[i + 1];
+
+      if (value >= start.value && value <= end.value) {
+        const t = (value - start.value) / (end.value - start.value);
+        return interpolateColor(start.color, end.color, t);
+      }
+    }
+
+    // Clamp to ends
+    if (value < colorStops[0].value) return colorStops[0].color;
+    return colorStops[colorStops.length - 1].color;
+  };
+}
+
+function interpolateColor(color1: string, color2: string, t: number): string {
+  const r1 = parseInt(color1.slice(1, 3), 16);
+  const g1 = parseInt(color1.slice(3, 5), 16);
+  const b1 = parseInt(color1.slice(5, 7), 16);
+
+  const r2 = parseInt(color2.slice(1, 3), 16);
+  const g2 = parseInt(color2.slice(3, 5), 16);
+  const b2 = parseInt(color2.slice(5, 7), 16);
+
+  const r = Math.round(r1 + (r2 - r1) * t);
+  const g = Math.round(g1 + (g2 - g1) * t);
+  const b = Math.round(b1 + (b2 - b1) * t);
+
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}

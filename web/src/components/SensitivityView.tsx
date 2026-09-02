@@ -10,7 +10,8 @@ import {
   Cell,
 } from 'recharts';
 import { Card } from './ui/Card';
-import { Heatmap, createColorScale } from './charts/Heatmap';
+import { Heatmap } from './charts/Heatmap';
+import { createColorScale } from '../utils/colors';
 import { usePaydownComparison, useSensitivity } from '../hooks/useSimulation';
 import type { BondParams, LocalAddInsConfig, SensitivityCell } from '../types';
 import { formatCurrency } from '../utils/formatters';
