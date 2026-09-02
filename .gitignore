@@ -1,4 +1,4 @@
-# Python-generated files
+# Python
 __pycache__/
 *.py[oc]
 build/
@@ -7,21 +7,38 @@ wheels/
 *.egg-info
 
 # Virtual environments
-.venv
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
 
 # Node.js
 node_modules/
 api/dist/
 web/dist/
+web/dist-ssr/
 infra/dist/
 infra/cdk.out/
+*.tsbuildinfo
 
 # Environment
 .env
-.env.local
+.env.*
+!.env.example
+
+# OS / editor
 .DS_Store
+**/.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
 
 # CDK
 *.d.ts
 !infra/lib/*.d.ts
 cdk.context.json
+
+# Generated backups (see extract_2018_2020_data.py)
+*.xlsx.bak
