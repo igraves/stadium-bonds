@@ -10,6 +10,7 @@ jobs:
   notebooks:
     name: Execute financing notebooks
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -42,6 +43,7 @@ jobs:
   app:
     name: Build API and web app
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
@@ -63,12 +65,17 @@ jobs:
 
       - name: Check the API answers with the default scenario
         run: |
-          LOCAL_DEV=true PORT=3000 node api/dist/index.js &
+          # Redirect the server's output to a file and kill it on exit. A
+          # background process that inherits the step's stdout keeps the runner
+          # waiting for the step long after the checks below have finished.
+          LOCAL_DEV=true PORT=3000 node api/dist/index.js > /tmp/api.log 2>&1 &
+          API_PID=$!
+          trap 'kill "$API_PID" 2>/dev/null || true' EXIT
           for i in $(seq 1 30); do
             curl -sf http://127.0.0.1:3000/health > /dev/null && break
             sleep 1
           done
-          curl -sf http://127.0.0.1:3000/health
+          curl -sf http://127.0.0.1:3000/health || { cat /tmp/api.log; exit 1; }
           curl -sf -X POST http://127.0.0.1:3000/api/simulate \
             -H 'Content-Type: application/json' -d '{}' \
             | node -e '
