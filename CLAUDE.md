@@ -1,6 +1,12 @@
-# County Study - Project Context
+# Chiefs STAR Bond Analysis - Project Context
 
-This project analyzes tax collection data and bond financing structures for Johnson County, Wyandotte County, and Johnson County cities in Kansas.
+Working context for AI-assisted development of this repository. It analyzes tax
+collection data and STAR bond financing structures for Johnson County, Wyandotte
+County, and Johnson County cities in Kansas.
+
+Where this file and `ASSUMPTIONS.md` / `BOND_ASSUMPTIONS.md` disagree on a
+number, those documents govern — they are the maintained derivations, this is
+background.
 
 ---
 
@@ -228,8 +234,10 @@ The project maintains a consolidated Excel file (`data/johnson_wyandotte_tax_con
 
 - **Entities**: Johnson County, Wyandotte County, and 18 Johnson County cities
 - **Tax Types**: Local Sales Tax, Use Tax
-- **Time Range**: 2019-2025 (Excel data); 2014-2018 (PDF data pending extraction)
-- **Granularity**: Monthly collections by entity
+- **Time Range**: 2018-2025. 2021-2025 are monthly from the Excel sources;
+  2018-2020 are annual totals backfilled by `extract_2018_2020_data.py` and
+  stamped to month 6. 2014-2017 remain PDF-only and are not extracted.
+- **Granularity**: Monthly collections by entity (annual for 2018-2020)
 
 ### Johnson County Cities in Dataset
 
@@ -239,11 +247,28 @@ Note: Lake Quivira excluded (no meaningful sales tax base - residential neighbor
 
 ---
 
-## Analysis Notebook
+## Notebooks and Code
 
-`tax_bond_analysis.ipynb` contains:
+`star_financing_model.ipynb` — the core model. Revenue increment by stream,
+capitalized-interest simulation, level amortization, coverage ratio, and
+interest-rate x growth-rate sensitivity grids.
+
+`star_financing_accelerated.ipynb` — the same model with `EXCESS_PAYDOWN_PCT`,
+which routes revenue above required debt service into early principal
+reduction. Note its saved parameters differ from the core notebook's defaults.
+
+`tax_bond_analysis.ipynb` — exploratory analysis of the underlying KDOR series:
 - Data loading and entity categorization
 - YoY growth analysis and CAGR calculations
 - Time series visualizations
 - Entity comparison charts
 - Bond projection models using historical growth rates
+
+`extract_2018_2020_data.py` — one-off ETL that backfills 2018-2020 annual
+totals into the consolidated workbook. It writes an `.xlsx.bak` alongside the
+file it updates; that backup is gitignored.
+
+`api/` — TypeScript port of the notebook model; it is what the live tool at
+starbonds.graveissues.com runs. Defaults live in `api/src/types/*.types.ts`
+and are served by `GET /api/defaults`. Changing a model default means changing
+it there, in the notebooks, and in the assumptions docs.

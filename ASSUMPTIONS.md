@@ -103,14 +103,20 @@ Cumulative Increment = Sum of Annual Increments from Year 1 to Year N
 
 ## Data Sources
 
+All paths are relative to the repository root.
+
 | Document | Description |
 |----------|-------------|
-| `Project-Monitor-2.0-STAR-Bond-Agreement-Execution-Version.pdf` | Official STAR Bond Agreement (Dec 22, 2025) |
-| `liqenffy25.pdf` | Kansas Liquor Enforcement Tax FY25 by county |
-| `450-Kansas-Lottery-FY-2026.pdf` | Kansas Lottery FY25-26 Budget Report |
-| `pub17000126.xlsx` | KDOR Pub 1700 - Sales Tax Rates (Jan 2026) |
-| `CY25LocUseTaxDist.xlsx` | KDOR CY2025 Local Use Tax Distributions |
-| `loytd2025.xlsx` | Johnson County / Cities sales tax data |
+| `data/Project-Monitor-2.0-STAR-Bond-Agreement-Execution-Version.pdf` | Official STAR Bond Agreement (Dec 22, 2025) |
+| `data/liqenffy25.pdf` | Kansas Liquor Enforcement Tax FY25 by county |
+| `data/450-Kansas-Lottery-FY-2026.pdf` | Kansas Lottery FY25-26 Budget Report |
+| `data/pub17000126.xlsx` | KDOR Pub 1700 - Sales Tax Rates (Jan 2026) |
+| `data/CY25LocUseTaxDist.xlsx` | KDOR CY2025 Local Use Tax Distributions |
+| `data/annual_sales_tax/loytd2025.xlsx` | Johnson County / Cities sales tax data |
+
+Prior-year editions of the last two are in `data/use_tax/` (CY2014-CY2025) and
+`data/annual_sales_tax/` (2014-2025); years through 2018 are PDFs, 2019 onward
+are spreadsheets.
 
 ---
 

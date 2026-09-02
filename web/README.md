@@ -1,73 +1,42 @@
-# React + TypeScript + Vite
+# web/ — STAR Bond dashboard front end
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React 19 + TypeScript + Vite + Tailwind. Renders the interactive model at
+[starbonds.graveissues.com](https://starbonds.graveissues.com/) against the
+Fastify API in [`../api`](../api).
 
-Currently, two official plugins are available:
+## Running locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+From the repository root (this is an npm workspace):
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev          # starts the API on :3000 and this app on :5173
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+To run only the front end (assumes an API is already listening on :3000):
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev:web
 ```
+
+The dev server proxies `/api` to `http://localhost:3000` — see
+[`vite.config.ts`](vite.config.ts). No environment variables are required.
+
+## Other commands
+
+```bash
+npm run build -w web     # tsc -b && vite build, output in web/dist
+npm run preview -w web   # serve the production build locally
+npm run lint -w web      # eslint
+```
+
+## Layout
+
+| Path | What it is |
+|------|------------|
+| `src/components/forms/` | Parameter inputs (bond terms, revenue growth, local add-ins, paydown) |
+| `src/components/charts/` | Recharts views: revenue vs. debt service, coverage, principal balance, sensitivity heatmaps |
+| `src/hooks/useSimulation.ts` | React Query wrapper over the `/api/simulate` endpoints |
+| `src/hooks/useUrlParams.ts` | Encodes the current scenario into the URL so a run can be shared |
+| `src/services/api.ts` | Typed API client |
+| `src/types/` | Shared request/response types, mirrored from `api/src/types` |

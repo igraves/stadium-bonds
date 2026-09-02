@@ -201,6 +201,12 @@ The notebook model allows adjustment of:
 
 ## Comparison: Old vs New Model
 
+An earlier version of this model deferred debt service through the construction
+period, accruing and capitalizing the payments rather than funding them from
+proceeds. That approach was replaced by the immediate debt service structure
+described above; the table below is kept for reference so the effect of the
+change is visible.
+
 | Metric | Old (Deferred) Model | New (Immediate) Model |
 |--------|---------------------|----------------------|
 | Bond Principal | $2.40B | $2.43B (gross) |

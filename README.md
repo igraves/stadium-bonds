@@ -1,5 +1,7 @@
 # Chiefs STAR Bond Analysis
 
+[![CI](https://github.com/igraves/stadium-bonds/actions/workflows/ci.yml/badge.svg)](https://github.com/igraves/stadium-bonds/actions/workflows/ci.yml)
+
 An open, auditable financial model of the Kansas STAR bond financing for the proposed Chiefs stadium in Wyandotte County, and what it means for taxpayers in Johnson and Wyandotte counties.
 
 **Live model:** https://starbonds.graveissues.com/
@@ -30,24 +32,53 @@ Primary documents are in [`data/`](data/): the executed STAR Bond Agreement, Kan
 
 | Path | What it is |
 |------|------------|
-| `star_financing_model.ipynb` | Core increment and debt-service model |
-| `star_financing_accelerated.ipynb` | Alternative amortization / timing scenarios |
-| `tax_bond_analysis.ipynb` | Exploratory tax base analysis |
-| `extract_2018_2020_data.py` | Pulls historical KDOR data used to establish baselines |
-| `api/` | Backend serving model outputs to the web app |
-| `web/` | Interactive front end (starbonds.graveissues.com) |
-| `infra/` | Deployment configuration |
+| `star_financing_model.ipynb` | Core model: revenue increment, capitalized interest, level amortization, coverage, sensitivity grids |
+| `star_financing_accelerated.ipynb` | The same model plus an `EXCESS_PAYDOWN_PCT` knob that applies revenue above required debt service to early principal reduction |
+| `tax_bond_analysis.ipynb` | Exploratory analysis of the underlying KDOR sales and use tax series (2018–2025) that the base-year amounts are drawn from |
+| `extract_2018_2020_data.py` | One-off ETL: pulls 2018–2020 annual totals out of the older KDOR file format and merges them into `data/johnson_wyandotte_tax_consolidated.xlsx` |
+| `api/` | Fastify/TypeScript port of the notebook model, served to the web app |
+| `web/` | React + Vite front end (starbonds.graveissues.com) |
+| `infra/` | AWS CDK stack: S3 + CloudFront + API Gateway + Lambda |
 | `data/` | Source documents and extracted datasets |
+| `notes/` | Research notes captured while building the model; not authoritative |
+| `.github/workflows/ci.yml` | Executes both financing notebooks and builds the API and web app on every push |
 | `CLAUDE.md` | Working notes for AI-assisted development of this repo |
 
+The TypeScript model in `api/` is the one behind the live tool; the notebooks are
+the reference implementation it was ported from.
+
 ## Running it
+
+### Notebooks
 
 ```bash
 uv sync
 uv run jupyter lab          # open the notebooks
 ```
 
-See `web/` and `api/` for running the interactive app locally.
+### Interactive app
+
+Requires Node 18+. From the repository root:
+
+```bash
+npm install                 # installs the api/, web/ and infra/ workspaces
+npm run dev                 # API on :3000, web on :5173
+```
+
+`npm run dev` runs both workspaces concurrently; `npm run dev:api` and
+`npm run dev:web` run them individually. The Vite dev server proxies `/api` to
+the local API, so open http://localhost:5173.
+
+Other useful targets:
+
+```bash
+npm run build               # type-check and build api/ and web/
+npm run lint -w web         # eslint
+```
+
+No environment variables are needed for local development. See
+[`.env.example`](.env.example) for the optional API and deployment settings, and
+[`infra/README.md`](infra/README.md) for deploying to AWS.
 
 ## Caveats
 

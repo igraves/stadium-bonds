@@ -1,5 +1,16 @@
 # Kansas Chiefs STAR Bond Financing — Updated Conversation Export (Including Use Tax Analysis)
 
+> **Research note, captured December 2025.** This is a lightly edited export of a
+> working session with Claude in which the compensating *use tax* was added to the
+> STAR increment base. It is preserved as a record of how the assumptions were
+> arrived at — it is **not** the model and it is **not** current.
+>
+> The figures below reflect a sales-only vs. sales+use comparison at 2% and 3%
+> growth. The model's current base-year amounts, growth defaults, and derivations
+> live in [`ASSUMPTIONS.md`](../ASSUMPTIONS.md) and
+> [`BOND_ASSUMPTIONS.md`](../BOND_ASSUMPTIONS.md); where the two disagree, those
+> documents govern.
+
 This file updates the prior export to include the **compensating use tax** analysis and its implications for the STAR bond revenue base.
 
 ---
@@ -133,11 +144,3 @@ Even accounting for LET, drink tax, and APSK:
 - The overwhelming bulk of repayment capacity comes from **state revenue growth** that otherwise would have supported normal statewide government services.
 
 ---
-
-## Conversation Export Updated
-If you want this turned into:
-- a council briefing memo
-- a public communication document
-- or an analytical white paper
-
-I can generate any of those formats next.
