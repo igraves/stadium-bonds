@@ -47,7 +47,6 @@ uv sync
 uv run jupyter lab          # open the notebooks
 ```
 
-<!-- TODO: add web/api run instructions -->
 See `web/` and `api/` for running the interactive app locally.
 
 ## Caveats
