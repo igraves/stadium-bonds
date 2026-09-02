@@ -1,7 +1,7 @@
 [project]
 name = "stadium-bonds"
 version = "0.1.0"
-description = "Add your description here"
+description = "Financial model of the Kansas STAR bond financing for the proposed Chiefs stadium"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

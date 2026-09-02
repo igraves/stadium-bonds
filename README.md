@@ -1,5 +1,7 @@
 # Chiefs STAR Bond Analysis
 
+[![CI](https://github.com/igraves/stadium-bonds/actions/workflows/ci.yml/badge.svg)](https://github.com/igraves/stadium-bonds/actions/workflows/ci.yml)
+
 An open, auditable financial model of the Kansas STAR bond financing for the proposed Chiefs stadium in Wyandotte County, and what it means for taxpayers in Johnson and Wyandotte counties.
 
 **Live model:** https://starbonds.graveissues.com/
@@ -10,12 +12,16 @@ An open, auditable financial model of the Kansas STAR bond financing for the pro
 
 Under the executed STAR Bond Agreement (Project Monitor 2.0, December 22, 2025), the state finances $1.8B of a $3.0B stadium through 30-year STAR bonds repaid from *incremental* state sales, use, alcohol, and sports-wagering tax revenue inside the district — only growth above the base year is captured.
 
-At default assumptions (5.0% bond rate, 2.5% revenue growth, 4-year construction, 1.30x coverage):
+At default assumptions ($2.4B issued, 5.0% bond rate, 2.5% revenue growth, 1.30x coverage):
 
-- Gross bond proceeds of roughly **$2.43B** are needed to fund $1.8B of construction plus debt service during construction.
-- Annual debt service is about **$158M**, requiring ~**$206M/yr** of pledged revenue at 1.30x coverage.
-- Increment revenue does not reach that threshold until **Year 12**. Years 5–11 show a cumulative shortfall of roughly **$400–500M** that has to be covered by reserve funds, state appropriations, or other pledged streams.
-- Over 30 years, sales + use tax provides over 95% of the increment. Alcohol and sports wagering are marginal.
+- Pledged revenue cannot cover debt service in the early years, because STAR captures only *growth* above a frozen base and that growth starts near zero. The unpaid interest is **capitalized** — added to principal, where it earns interest itself.
+- Principal grows from $2.4B to about **$2.6B** before amortization begins. Annual debt service is then roughly **$187–197M**, requiring **$243–257M/yr** at 1.30x coverage.
+- Revenue does not reach that threshold until **Year 8–12**, depending on which of the two use tax estimates you use and which capitalization rule. Until then the debt compounds.
+- Total interest over 30 years is **$2.6–3.1B** — more than the amount borrowed. Under the reference model, $0.54B of principal is still outstanding at Year 30.
+- Sales + use tax supplies about **88%** of pledged revenue, and **96%** of the *growth* being diverted. Alcohol and sports wagering are marginal either way.
+
+The two ranges above are not uncertainty bands — they are two implementations
+that genuinely disagree. Both are documented rather than averaged.
 
 Every input above is adjustable in the live tool and the notebooks. Full derivations and sources:
 
@@ -30,24 +36,53 @@ Primary documents are in [`data/`](data/): the executed STAR Bond Agreement, Kan
 
 | Path | What it is |
 |------|------------|
-| `star_financing_model.ipynb` | Core increment and debt-service model |
-| `star_financing_accelerated.ipynb` | Alternative amortization / timing scenarios |
-| `tax_bond_analysis.ipynb` | Exploratory tax base analysis |
-| `extract_2018_2020_data.py` | Pulls historical KDOR data used to establish baselines |
-| `api/` | Backend serving model outputs to the web app |
-| `web/` | Interactive front end (starbonds.graveissues.com) |
-| `infra/` | Deployment configuration |
+| `star_financing_model.ipynb` | Core model: revenue increment, capitalized interest, level amortization, coverage, sensitivity grids |
+| `star_financing_accelerated.ipynb` | The same model plus an `EXCESS_PAYDOWN_PCT` knob that applies revenue above required debt service to early principal reduction |
+| `tax_bond_analysis.ipynb` | Exploratory analysis of the underlying KDOR sales and use tax series (2018–2025) that the base-year amounts are drawn from |
+| `extract_2018_2020_data.py` | One-off ETL: pulls 2018–2020 annual totals out of the older KDOR file format and merges them into `data/johnson_wyandotte_tax_consolidated.xlsx` |
+| `api/` | Fastify/TypeScript port of the notebook model, served to the web app |
+| `web/` | React + Vite front end (starbonds.graveissues.com) |
+| `infra/` | AWS CDK stack: S3 + CloudFront + API Gateway + Lambda |
 | `data/` | Source documents and extracted datasets |
+| `notes/` | Research notes captured while building the model; not authoritative |
+| `.github/workflows/ci.yml` | Executes both financing notebooks and builds the API and web app on every push |
 | `CLAUDE.md` | Working notes for AI-assisted development of this repo |
 
+The TypeScript model in `api/` is the one behind the live tool; the notebooks are
+the reference implementation it was ported from.
+
 ## Running it
+
+### Notebooks
 
 ```bash
 uv sync
 uv run jupyter lab          # open the notebooks
 ```
 
-See `web/` and `api/` for running the interactive app locally.
+### Interactive app
+
+Requires Node 18+. From the repository root:
+
+```bash
+npm install                 # installs the api/, web/ and infra/ workspaces
+npm run dev                 # API on :3000, web on :5173
+```
+
+`npm run dev` runs both workspaces concurrently; `npm run dev:api` and
+`npm run dev:web` run them individually. The Vite dev server proxies `/api` to
+the local API, so open http://localhost:5173.
+
+Other useful targets:
+
+```bash
+npm run build               # type-check and build api/ and web/
+npm run lint -w web         # eslint
+```
+
+No environment variables are needed for local development. See
+[`.env.example`](.env.example) for the optional API and deployment settings, and
+[`infra/README.md`](infra/README.md) for deploying to AWS.
 
 ## Caveats
 

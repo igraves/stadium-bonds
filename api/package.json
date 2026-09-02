@@ -1,7 +1,7 @@
 {
   "name": "star-bond-api",
   "version": "1.0.0",
-  "description": "STAR Bond Financing Model API - TypeScript/Danfo.js backend",
+  "description": "STAR Bond Financing Model API - Fastify/TypeScript backend",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
@@ -17,7 +17,6 @@
     "@fastify/aws-lambda": "^3.5.0",
     "@fastify/cors": "^8.5.0",
     "@fastify/static": "^7.0.0",
-    "danfojs-node": "^1.1.2",
     "fastify": "^4.26.0"
   },
   "devDependencies": {

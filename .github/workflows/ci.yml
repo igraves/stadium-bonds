@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# Superseded runs on the same branch are cancelled rather than left to occupy a
+# runner until they time out.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  notebooks:
+    name: Execute financing notebooks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Sync Python environment
+        run: uv sync --frozen
+
+      # Executes each notebook top to bottom and fails on the first cell that
+      # raises. Output goes to /dev/null: this is a smoke test that the model
+      # still runs, not a check that the numbers are unchanged.
+      - name: Run star_financing_model.ipynb
+        run: >
+          uv run --frozen jupyter nbconvert --to notebook --execute
+          --stdout star_financing_model.ipynb > /dev/null
+
+      - name: Run star_financing_accelerated.ipynb
+        run: >
+          uv run --frozen jupyter nbconvert --to notebook --execute
+          --stdout star_financing_accelerated.ipynb > /dev/null
+
+      - name: Run tax_bond_analysis.ipynb
+        run: >
+          uv run --frozen jupyter nbconvert --to notebook --execute
+          --stdout tax_bond_analysis.ipynb > /dev/null
+
+  app:
+    name: Build API and web app
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint the web app
+        run: npm run lint -w web
+
+      - name: Type-check and build both workspaces
+        run: npm run build
+
+      - name: Build the Lambda bundle
+        run: npm run build:lambda
+
+      - name: Check the API answers with the default scenario
+        run: |
+          # Redirect the server's output to a file and kill it on exit. A
+          # background process that inherits the step's stdout keeps the runner
+          # waiting for the step long after the checks below have finished.
+          LOCAL_DEV=true PORT=3000 node api/dist/index.js > /tmp/api.log 2>&1 &
+          API_PID=$!
+          trap 'kill "$API_PID" 2>/dev/null || true' EXIT
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:3000/health > /dev/null && break
+            sleep 1
+          done
+          curl -sf http://127.0.0.1:3000/health || { cat /tmp/api.log; exit 1; }
+          curl -sf -X POST http://127.0.0.1:3000/api/simulate \
+            -H 'Content-Type: application/json' -d '{}' \
+            | node -e '
+              let raw = "";
+              process.stdin.on("data", (d) => (raw += d));
+              process.stdin.on("end", () => {
+                const { success, data } = JSON.parse(raw);
+                if (!success || data.schedule.length !== data.summary.termYears) {
+                  throw new Error("unexpected /api/simulate response");
+                }
+                console.log(
+                  `annual debt service $${Math.round(data.summary.annualDebtService / 1e6)}M ` +
+                  `after ${data.summary.capitalizationYears} capitalization years`
+                );
+              });
+            '
