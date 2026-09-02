@@ -6,6 +6,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Superseded runs on the same branch are cancelled rather than left to occupy a
+# runner until they time out.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   notebooks:
     name: Execute financing notebooks
